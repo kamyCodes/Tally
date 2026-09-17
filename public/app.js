@@ -75,9 +75,13 @@ function renderTasks(tasks) {
   taskList.innerHTML = tasks.map(task => {
     // Card CSS class based on state
     let cardClass = 'task-card';
-    if (task.status === 'done') cardClass += ' done-card';
-    else if (task.overdue) cardClass += ' overdue';
-    else if (task.due_in_days !== null && task.due_in_days <= 2 && task.due_in_days >= 0) cardClass += ' due-soon';
+    if (task.status === 'done') {
+      cardClass += ' done-card';
+    } else if (task.overdue) {
+      cardClass += ' overdue';
+    } else if (task.due_in_days != null && task.due_in_days >= 0 && task.due_in_days <= 2) {
+      cardClass += ' due-soon';
+    }
 
     // Status badge
     const statusLabel = task.status === 'in-progress' ? 'In Progress' : task.status.charAt(0).toUpperCase() + task.status.slice(1);
@@ -89,13 +93,16 @@ function renderTasks(tasks) {
       if (task.status === 'done') {
         dueHtml = `<span class="due-label due-future">Due: ${task.due_date}</span>`;
       } else if (task.overdue) {
-        dueHtml = `<span class="due-label due-overdue">⚠ Overdue by ${Math.abs(task.due_in_days)} day${Math.abs(task.due_in_days) !== 1 ? 's' : ''}</span>`;
+        const absDays = Math.abs(task.due_in_days || 0);
+        dueHtml = `<span class="due-label due-overdue">⚠ Overdue by ${absDays} day${absDays !== 1 ? 's' : ''}</span>`;
       } else if (task.due_in_days === 0) {
         dueHtml = `<span class="due-label due-today">⏰ Due today</span>`;
-      } else if (task.due_in_days <= 2) {
+      } else if (task.due_in_days != null && task.due_in_days <= 2 && task.due_in_days > 0) {
         dueHtml = `<span class="due-label due-today">Due in ${task.due_in_days} day${task.due_in_days !== 1 ? 's' : ''}</span>`;
-      } else {
+      } else if (task.due_in_days != null && task.due_in_days > 2) {
         dueHtml = `<span class="due-label due-future">Due in ${task.due_in_days} days</span>`;
+      } else {
+        dueHtml = `<span class="due-label due-future">Due: ${task.due_date}</span>`;
       }
     }
 

@@ -1,0 +1,4 @@
+node_modules/
+tasks.db
+tasks.db-wal
+tasks.db-shm

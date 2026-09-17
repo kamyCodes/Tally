@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Task Manager</h1>
+
+    <!-- Task form -->
+    <form id="task-form">
+      <input type="hidden" id="task-id" value="">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="title">Title *</label>
+          <input type="text" id="title" required placeholder="What needs to be done?">
+        </div>
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status">
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="description">Description</label>
+          <input type="text" id="description" placeholder="Optional details">
+        </div>
+        <div class="form-group">
+          <label for="due_date">Due Date</label>
+          <input type="date" id="due_date">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" id="submit-btn">Add Task</button>
+        <button type="button" id="cancel-btn" class="hidden" onclick="cancelEdit()">Cancel</button>
+      </div>
+    </form>
+
+    <div id="error-msg" class="error hidden"></div>
+
+    <!-- Task list -->
+    <div id="task-list"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

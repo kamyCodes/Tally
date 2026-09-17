@@ -25,11 +25,27 @@ function queryOne(sql, params = []) {
   return rows.length > 0 ? rows[0] : null;
 }
 
+// Compute overdue and due-in-n-days for a task object
+function enrichTask(task) {
+  if (!task || !task.due_date || task.status === 'done') {
+    task.overdue = false;
+    task.due_in_days = null;
+    return task;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(task.due_date + 'T00:00:00');
+  const diffMs = due.getTime() - today.getTime();
+  task.due_in_days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  task.overdue = task.due_in_days < 0;
+  return task;
+}
+
 // GET /tasks — list all tasks
 router.get('/', (req, res) => {
   try {
     const tasks = queryAll('SELECT * FROM tasks ORDER BY created_date DESC');
-    res.json(tasks);
+    res.json(tasks.map(enrichTask));
   } catch (err) {
     console.error('Error fetching tasks:', err.message);
     res.status(500).json({ error: 'Failed to fetch tasks' });
@@ -43,7 +59,7 @@ router.get('/:id', (req, res) => {
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
-    res.json(task);
+    res.json(enrichTask(task));
   } catch (err) {
     console.error('Error fetching task:', err.message);
     res.status(500).json({ error: 'Failed to fetch task' });
@@ -78,7 +94,7 @@ router.post('/', (req, res) => {
 
     // Get the inserted row — use MAX(id) since sql.js resets last_insert_rowid across exec calls
     const newTask = queryOne('SELECT * FROM tasks WHERE id = (SELECT MAX(id) FROM tasks)');
-    res.status(201).json(newTask);
+    res.status(201).json(enrichTask(newTask));
   } catch (err) {
     console.error('Error creating task:', err.message);
     res.status(500).json({ error: 'Failed to create task' });
@@ -106,6 +122,18 @@ router.put('/:id', (req, res) => {
       });
     }
 
+    // Can't mark done before the due date
+    const effectiveStatus = status !== undefined ? status : existing.status;
+    const effectiveDue = due_date !== undefined ? (due_date || null) : existing.due_date;
+    if (effectiveStatus === 'done' && effectiveDue) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const due = new Date(effectiveDue + 'T00:00:00');
+      if (due > today) {
+        return res.status(400).json({ error: `Cannot mark done — due date is ${effectiveDue} (future). Complete it on or after that date.` });
+      }
+    }
+
     if (due_date !== undefined && due_date !== null && due_date !== '' && isNaN(Date.parse(due_date))) {
       return res.status(400).json({ error: 'Invalid due_date. Use a valid date format (YYYY-MM-DD)' });
     }
@@ -126,7 +154,7 @@ router.put('/:id', (req, res) => {
     saveDb();
 
     const updated = queryOne('SELECT * FROM tasks WHERE id = ?', [id]);
-    res.json(updated);
+    res.json(enrichTask(updated));
   } catch (err) {
     console.error('Error updating task:', err.message);
     res.status(500).json({ error: 'Failed to update task' });

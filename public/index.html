@@ -9,14 +9,20 @@
 </head>
 <body>
   <div class="container">
-    <h1>Tally</h1>
+    <header class="header">
+      <img src="tally-icon.png" alt="Tally" class="logo">
+      <div>
+        <h1>Tally</h1>
+        <p class="tagline">Stay on top of your tasks</p>
+      </div>
+    </header>
 
     <!-- Task form -->
-    <form id="task-form">
+    <form id="task-form" class="card">
       <input type="hidden" id="task-id" value="">
 
       <div class="form-row">
-        <div class="form-group">
+        <div class="form-group grow">
           <label for="title">Title *</label>
           <input type="text" id="title" required placeholder="What needs to be done?">
         </div>
@@ -31,7 +37,7 @@
       </div>
 
       <div class="form-row">
-        <div class="form-group">
+        <div class="form-group grow">
           <label for="description">Description</label>
           <input type="text" id="description" placeholder="Optional details">
         </div>
@@ -42,8 +48,10 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" id="submit-btn">Add Task</button>
-        <button type="button" id="cancel-btn" class="hidden" onclick="cancelEdit()">Cancel</button>
+        <button type="submit" id="submit-btn" class="btn-primary">
+          <span class="btn-icon">+</span> Add Task
+        </button>
+        <button type="button" id="cancel-btn" class="btn-secondary hidden" onclick="cancelEdit()">Cancel</button>
       </div>
     </form>
 

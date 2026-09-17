@@ -1,6 +1,6 @@
-# Task Manager
+# Tally
 
-A simple task management application with a Node.js/Express backend, SQLite database, and a plain HTML/CSS/JS frontend.
+A simple task management app with a Node.js/Express backend, SQLite database, and a plain HTML/CSS/JS frontend.
 
 ## Install Dependencies
 
